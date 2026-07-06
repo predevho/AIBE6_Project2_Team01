@@ -8,6 +8,7 @@ import jakarta.validation.constraints.Size;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.Collection;
 import java.util.List;
 
 @Service
@@ -25,6 +26,10 @@ public class ClientService {
     public Client findByUserId(Long userId) {
         return clientRepository.findByUserId(userId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 유저의 모델 프로필이 존재하지 않습니다."));
+    }
+
+    public List<Client> findByUserIds(Collection<Long> userIds) {
+        return clientRepository.findByUser_IdIn(userIds);
     }
 
 

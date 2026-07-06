@@ -244,6 +244,15 @@ public class JobPostingService {
         return JobPostingResponse.from(jobPosting);
     }
 
+    /**
+     * 타 도메인에서 여러 공고를 한 번에 조회할 때 사용 (N +1 방지용 배치 조회)
+     */
+    public List<JobPostingResponse> getJobPostingsByIds(List<Long> jobPostingIds) {
+        return jobPostingRepository.findAllById(jobPostingIds).stream()
+                .map(JobPostingResponse::from)
+                .toList();
+    }
+
     // JOB-006~008: 뷰어 타입에 따라 다른 공고 상세 정보를 반환한다.
     public JobPostingDetailResponse getJobPostingDetail(Long jobPostingId, ViewerType viewerType) {
         JobPosting jobPosting = jobPostingRepository.findById(jobPostingId)

@@ -12,10 +12,9 @@ import com.modle.domain.jobposting.dto.response.JobPostingResponse;
 import com.modle.domain.jobposting.dto.response.MyJobPostingResponse;
 import com.modle.domain.jobposting.service.JobPostingService;
 import com.modle.domain.profile.service.ClientService;
+import com.modle.domain.user.entity.Client;
 import com.modle.domain.user.entity.Model;
-import com.modle.domain.user.entity.User;
 import com.modle.domain.user.repository.ModelRepository;
-import com.modle.domain.user.service.UserService;
 import com.modle.global.exception.CustomException;
 import com.modle.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
@@ -33,7 +32,6 @@ public class ContractQueryService {
     private final ContractRepository contractRepository;
     private final ApplicationRepository applicationRepository;
     private final JobPostingService jobPostingService;
-    private final UserService userService;
     private final ModelRepository modelRepository;
     private final ClientService clientService;
 
@@ -65,7 +63,8 @@ public class ContractQueryService {
 
         Map<Long, Contract> contractMap = getContractMap(applications);
 
-        return applications.stream()
+        //계약이 있고 상태 필터를 통과한 대상만 먼저 추출 (불필요한 배치 조회 방지)
+        List<Application> targets = applications.stream()
                 .filter(application -> contractMap.containsKey(application.getId()))
                 .filter(application -> matchesListStatus(
                         contractMap.get(application.getId()),
@@ -73,16 +72,43 @@ public class ContractQueryService {
                         status,
                         false
                 ))
+                .toList();
+
+        if (targets.isEmpty()) {
+            return List.of();
+        }
+
+        // 1) 공고 배치 조회 : jobPostingId -> clientId(기업 user id)
+        List<Long> jobPostingIds = targets.stream()
+                .map(Application::getJobPostingId)
+                .distinct()
+                .toList();
+        Map<Long, Long> clientUserIdByJobPostingId = jobPostingService.getJobPostingsByIds(jobPostingIds).stream()
+                .collect(Collectors.toMap(
+                        JobPostingResponse::id,
+                        JobPostingResponse::clientId
+                ));
+
+        // 2) 기업 배치 조회 : clientUserId -> companyName
+        List<Long> clientUserIds = clientUserIdByJobPostingId.values().stream()
+                .distinct()
+                .toList();
+        Map<Long, String> companyNameByUserId = clientService.findByUserIds(clientUserIds).stream()
+                .collect(Collectors.toMap(
+                        client -> client.getUser().getId(),
+                        Client::getCompanyName
+                ));
+
+        return targets.stream()
                 .map(application -> {
                     Contract contract = contractMap.get(application.getId());
-                    JobPostingResponse jobPosting = jobPostingService.getJobPosting(application.getJobPostingId());
-                    User clientUser = userService.findById(jobPosting.clientId());
-                    var client = clientService.findByUserId(clientUser.getId());
+                    Long clientUserId = clientUserIdByJobPostingId.get(application.getJobPostingId());
+                    String companyName = companyNameByUserId.get(clientUserId);
 
                     return toContractListItemResponse(
                             contract,
                             application,
-                            client.getCompanyName()
+                            companyName
                     );
                 })
                 .toList();
