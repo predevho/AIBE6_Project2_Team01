@@ -3,7 +3,9 @@ package com.modle.global.init;
 import com.modle.domain.application.entity.Application;
 import com.modle.domain.application.entity.type.ApplicationStatus;
 import com.modle.domain.application.repository.ApplicationRepository;
+import com.modle.domain.contract.entity.Contract;
 import com.modle.domain.contract.entity.ContractTemplate;
+import com.modle.domain.contract.repository.ContractRepository;
 import com.modle.domain.contract.repository.ContractTemplateRepository;
 import com.modle.domain.profile.entity.Career;
 import com.modle.domain.profile.repository.CareerRepository;
@@ -57,6 +59,7 @@ public class InitData {
         private final JobPostingRepository jobPostingRepository;
         private final ApplicationRepository applicationRepository;
         private final CareerRepository careerRepository;
+        private final ContractRepository contractRepository;
 
         @Bean
         public ApplicationRunner initDataApplicationRunner() {
@@ -70,6 +73,7 @@ public class InitData {
                         self.work8(); // 추천 테스트용 모델 500개
                         self.work9(); // 시연용 연예인 모델 10명
                         self.work10(); // 시연용 공고 상태/지원 시나리오
+                        self.work11(); // 시연용 계약 목록 데이터
                 };
         }
 
@@ -699,6 +703,147 @@ public class InitData {
                         }
                 }
                 return result;
+        }
+
+        // 시연용 계약 목록 데이터 — model@modle.com 모델과 client@modle.com 의뢰인에게
+        // 계약을 몰아, 양쪽 계약 목록(진행중·완료·취소)을 모두 채운다.
+        // 로그인: model@modle.com / model1234 (모델), client@modle.com / client1234 (기업)
+        @Transactional
+        public void work11() {
+                if (contractRepository.count() > 0) {
+                        return;
+                }
+
+                // 계약 시연용 의뢰인 (client@modle.com)
+                Long clientUserId;
+                if (userRepository.existsByEmail("client@modle.com")) {
+                        clientUserId = userRepository.findByEmail("client@modle.com").map(User::getId).orElse(null);
+                } else {
+                        User clientUser = User.createLocal(
+                                        "client@modle.com",
+                                        passwordEncoder.encode("client1234"),
+                                        "SEOUL",
+                                        Role.CLIENT);
+                        clientUser.updateStatus(UserStatus.ACTIVE);
+                        userRepository.save(clientUser);
+                        clientRepository.save(Client.create(
+                                        clientUser, ClientType.ORGANIZATION, "테스트기업", "123-45-67890"));
+                        clientUserId = clientUser.getId();
+                }
+
+                // 계약 시연용 모델 (model@modle.com)
+                Long modelId;
+                if (userRepository.existsByEmail("model@modle.com")) {
+                        modelId = modelIdByEmail("model@modle.com");
+                } else {
+                        User modelUser = User.createLocal(
+                                        "model@modle.com",
+                                        passwordEncoder.encode("model1234"),
+                                        "SEOUL",
+                                        Role.MODEL);
+                        userRepository.save(modelUser);
+                        modelId = modelService.create(modelUser, "테스트모델", 178, 68, M, 28).getId();
+                }
+
+                if (clientUserId == null || modelId == null) {
+                        return;
+                }
+
+                // ── 진행중 4 / 완료 2 / 취소 3 = 9건 (전부 client@modle.com 소유 공고) ──
+                seedContract(savePosting(clientUserId, "시연 계약 01 - 진행중(컨택)", Category.FITTING, Region.SEOUL),
+                                modelId, ApplicationStatus.CONTACTED, "지원합니다 01", "VIEWED");
+                seedContract(savePosting(clientUserId, "시연 계약 02 - 진행중(발송)", Category.HAIR, Region.BUSAN),
+                                modelId, ApplicationStatus.CONTRACT_SENT, "지원합니다 02", "NOTIFIED");
+                seedContract(savePosting(clientUserId, "시연 계약 03 - 진행중(촬영)", Category.PRODUCT, Region.INCHEON),
+                                modelId, ApplicationStatus.SHOOTING, "지원합니다 03", "CONFIRMED");
+                seedContract(savePosting(clientUserId, "시연 계약 04 - 진행중(보류)", Category.MAKEUP, Region.GYEONGGI),
+                                modelId, ApplicationStatus.ON_HOLD, "지원합니다 04", "VIEWED");
+
+                seedContract(savePosting(clientUserId, "시연 계약 05 - 완료", Category.ETC, Region.SEOUL),
+                                modelId, ApplicationStatus.COMPLETED, "지원합니다 05", "CONFIRMED");
+                seedContract(savePosting(clientUserId, "시연 계약 06 - 완료", Category.FOOD, Region.DAEGU),
+                                modelId, ApplicationStatus.COMPLETED, "지원합니다 06", "CONFIRMED");
+
+                seedContract(savePosting(clientUserId, "시연 계약 07 - 취소(반려)", Category.HAND, Region.GWANGJU),
+                                modelId, ApplicationStatus.CONTRACT_SENT, "지원합니다 07", "REJECTED");
+                seedContract(savePosting(clientUserId, "시연 계약 08 - 취소(반려)", Category.FITTING, Region.JEJU),
+                                modelId, ApplicationStatus.CONTRACT_SENT, "지원합니다 08", "REJECTED");
+                seedContract(savePosting(clientUserId, "시연 계약 09 - 취소(촬영취소)", Category.PRODUCT, Region.DAEJEON),
+                                modelId, ApplicationStatus.SHOOTING_CANCELLED, "지원합니다 09", "CONFIRMED");
+        }
+
+        // 시연 계약용 공고 1건 저장 (client@modle.com 소유)
+        private JobPosting savePosting(Long clientUserId, String title, Category category, Region region) {
+                return jobPostingRepository.save(JobPosting.builder()
+                                .clientId(clientUserId)
+                                .title(title)
+                                .content(title + " 촬영 모델을 모집합니다. (시연용)")
+                                .category(category)
+                                .region(region)
+                                .status(JobPostingStatus.RECRUITING)
+                                .requiredSex(RequiredSex.ANY)
+                                .requiredCount(1)
+                                .ageMin(20)
+                                .ageMax(40)
+                                .payment(new BigDecimal("500000"))
+                                .payType(PayType.CASH)
+                                .shootDate(LocalDateTime.of(2026, 8, 1, 10, 0))
+                                .build());
+        }
+
+        // 지원(Application) 1건 저장 후, 그 지원에 연결된 계약을 phase 상태로 만들어 저장한다.
+        private void seedContract(
+                        JobPosting jobPosting,
+                        Long modelId,
+                        ApplicationStatus applicationStatus,
+                        String coverLetter,
+                        String phase) {
+                Application application = applicationRepository.save(Application.builder()
+                                .jobPostingId(jobPosting.getId())
+                                .modelId(modelId)
+                                .coverLetter(coverLetter)
+                                .status(applicationStatus)
+                                .build());
+
+                LocalDateTime t = LocalDateTime.of(2026, 6, 1, 10, 0);
+                Contract contract = Contract.createDraft(
+                                application.getId(),
+                                com.modle.domain.contract.entity.type.ContractType.TEMPLATE,
+                                LocalDateTime.of(2026, 8, 1, 10, 0),
+                                LocalDateTime.of(2026, 8, 1, 18, 0),
+                                "촬영 스튜디오 (" + jobPosting.getRegion().name() + ")",
+                                new BigDecimal("500000"),
+                                com.modle.domain.contract.entity.type.PayType.CASH,
+                                "온라인/오프라인 광고 3개월",
+                                "시연용 더미 계약서",
+                                "https://example.com/contract/" + application.getId() + ".pdf");
+
+                switch (phase) {
+                        case "NOTIFIED" -> contract.notifyModel(t);
+                        case "VIEWED" -> {
+                                contract.notifyModel(t);
+                                contract.markViewedAt(t);
+                        }
+                        case "CONFIRMED" -> {
+                                contract.notifyModel(t);
+                                contract.markViewedAt(t);
+                                contract.clientAgree(t, "127.0.0.1");
+                                contract.modelAgree(t, "127.0.0.1");
+                                contract.confirm(
+                                                "https://example.com/contract/" + application.getId() + "-signed.pdf",
+                                                t);
+                        }
+                        case "REJECTED" -> {
+                                contract.notifyModel(t);
+                                contract.markViewedAt(t);
+                                contract.reject("일정이 맞지 않아 반려합니다.");
+                        }
+                        default -> {
+                                // DRAFT: 별도 전환 없음
+                        }
+                }
+
+                contractRepository.save(contract);
         }
 
 }

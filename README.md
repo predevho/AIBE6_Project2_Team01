@@ -1,16 +1,13 @@
 <div align="center">
 
 # <img width="150" height="150" alt="icon" src="https://github.com/user-attachments/assets/ea3d40b9-0d91-4630-9114-b908eead6e42" />
-</g>
-</svg>
 
+**MODLE · 계약 도메인 개발기 — 임현호**
 
-**모델이 필요한, 모델이 되고 싶은 분들을 위한 매칭 플랫폼, MODLE**
+모델–클라이언트 매칭 플랫폼 **MODLE**에서 제가 맡은 **계약(Contract) 도메인**을 중심으로,
+설계 판단과 성능 트러블슈팅을 정리한 개인 포트폴리오 저장소입니다.
 
-광고·화보·행사 등 다양한 촬영에 필요한 모델과 이를 찾는 클라이언트를
-AI 추천 기반으로 연결하고, 지원·계약·리뷰까지 한 곳에서 처리하는 매칭 서비스입니다.
-
-[🔗 서비스 바로가기](https://modle-eta.vercel.app) · [📹 데모 영상](https://drive.google.com/file/d/1_EtW_RT1hyAE6_fkIGSAZIzuWU0LkFiw/view?usp=sharing)
+[🔗 서비스 바로가기](https://modle-eta.vercel.app) · [📹 데모 영상](https://drive.google.com/file/d/1_EtW_RT1hyAE6_fkIGSAZIzuWU0LkFiw/view?usp=sharing) · [🧾 원본 팀 저장소](https://github.com/prgrms-aibe-devcourse/AIBE6_Project2_Team01)
 
 </div>
 
@@ -18,84 +15,133 @@ AI 추천 기반으로 연결하고, 지원·계약·리뷰까지 한 곳에서 
 
 ## 📑 목차
 
-1. [프로젝트 소개](#-프로젝트-소개)
-2. [멤버 소개](#-멤버-소개)
-3. [기술 스택](#-기술-스택)
-4. [주요 기능](#-주요-기능)
-5. [API 명세서](#-api-명세서)
-6. [파일 구조](#-파일-구조)
-7. [시스템 아키텍처](#-시스템-아키텍처)
-8. [ERD](#-erd)
+1. [이 저장소에 대하여](#-이-저장소에-대하여)
+2. [프로젝트 한눈에](#-프로젝트-한눈에)
+3. [내가 맡은 일 — 계약 도메인](#-내가-맡은-일--계약-도메인)
+4. [트러블슈팅 · 3N+2 쿼리를 5개로](#-트러블슈팅--3n2-쿼리를-5개로)
+5. [기술적 의사결정 기록](#-기술적-의사결정-기록)
+6. [기술 스택](#-기술-스택)
+7. [데이터 모델](#-데이터-모델)
+8. [시스템 아키텍처](#-시스템-아키텍처)
 9. [실행 방법](#-실행-방법)
+10. [팀 & 원본 프로젝트](#-팀--원본-프로젝트)
 
 ---
 
-## 📌 프로젝트 소개
+## 🙋 이 저장소에 대하여
 
-**Modle**은 모델 구인을 원하는 **클라이언트(Client)** 와 일감을 찾는 **모델(Model)** 을 매칭해주는 플랫폼입니다.
+- 이 저장소는 5인 팀 프로젝트 **Modle**의 **개인 포크**입니다. 원본은 [prgrms-aibe-devcourse/AIBE6_Project2_Team01](https://github.com/prgrms-aibe-devcourse/AIBE6_Project2_Team01)이며, 전체 서비스는 팀원 5명이 함께 만들었습니다.
+- 이 README는 **제가 담당한 계약(Contract) 도메인**을 중심으로, 기능·설계 판단·성능 개선 과정을 포트폴리오 관점에서 다시 정리한 문서입니다.
+- 전체 팀 관점의 원본 README는 [`README.team-original.md`](README.team-original.md)에 그대로 보존해 두었습니다.
 
-- **다양한 모델**을 매칭하고 찾을 수 있는 플랫폼입니다.
-- **클라이언트**는 촬영 조건(카테고리·지역·성별·신체 조건·페이 등)을 담은 **공고**를 등록하고, 지원자를 관리합니다.
-- **모델**은 자신의 **프로필·포트폴리오**를 등록하고 원하는 공고에 **지원**합니다.
-- **AI 임베딩 기반 추천**으로 공고에 적합한 모델, 모델에게 적합한 공고를 추천합니다.
-- 매칭이 성사되면 **쪽지**로 소통하고, **전자 계약서(PDF)** 작성·서명을 거쳐 촬영을 진행한 뒤 **상호 리뷰**를 남깁니다.
-- **관리자**는 클라이언트 가입 승인, 신고 처리 등 플랫폼 운영을 담당합니다.
+> **한 문장 요약** — 촬영 매칭 이후 이어지는 **전자 계약서 작성 → 발송 → 열람 → 양측 동의/확정** 흐름을 설계하고, 계약 목록 조회의 `3N+2` N+1 쿼리를 상수 5개로 줄였습니다.
+
+---
+
+## 📌 프로젝트 한눈에
+
+**Modle**은 광고·화보·행사 촬영에 필요한 **모델**과 이를 찾는 **클라이언트**를 AI 추천 기반으로 연결하고, 지원·계약·리뷰까지 한 곳에서 처리하는 매칭 서비스입니다.
+
+매칭이 성사되면 쪽지로 소통하고 **전자 계약서(PDF)** 를 작성·서명한 뒤 촬영을 진행하고 상호 리뷰를 남깁니다. 제가 담당한 계약 도메인은 이 흐름에서 **"컨택 이후 ~ 촬영 확정"** 사이를 책임집니다.
 
 | 항목 | 내용 |
 |------|------|
 | 프로젝트명 | Modle |
-| 팀명 | AIBE6 Project2 Team01(락(樂)&롤(Role)) |
+| 팀 | AIBE6 Project2 Team01 (락(樂)&롤(Role)) |
 | 개발 기간 | 2026.06.11 ~ 2026.06.24 |
+| 나의 담당 | **계약 도메인**, 계약–쪽지 연동 API |
 | 한 줄 소개 | 모델이 필요한, 모델이 되고 싶은 분들을 위한 매칭 플랫폼 |
 
 ---
 
-## 👥 멤버 소개
+## 🧑‍💻 내가 맡은 일 — 계약 도메인
 
-| **김락현(팀장)** | **김영욱** | **신재희** | **임현호** | **최정우** |
-|---------|---------|---------|---------|---------|
-| [@Rakhyunn](https://github.com/Rakhyunn) | [@wooki0123](https://github.com/wooki0123) | [@SHINJAEHEE-DEV](https://github.com/SHINJAEHEE-DEV) | [@predevho](https://github.com/predevho) | [@woo0218](https://github.com/woo0218) |
+매칭이 성사된 지원 건을 실제 계약으로 확정하는 **전자 계약(Contract)** 전 과정을 설계·구현했습니다.
 
-### 담당 기능
+### 담당 범위
+- **전자 계약서 작성/저장** — 촬영 일정·장소·페이·사용 범위 등을 담은 계약서 임시 저장(DRAFT)과 템플릿(`ContractTemplate`) 기반 작성
+- **계약서 PDF 생성** — `OpenHTMLtoPDF`로 HTML 템플릿을 PDF로 변환, 양 당사자 동의/서명과 **IP·시각 기록**
+- **계약 상태 흐름 관리** — `DRAFT → NOTIFIED → VIEWED → CONFIRMED / REJECTED`, 양측 동의 시 자동 확정
+- **계약–쪽지 연동 API** — 계약 발송·진행 상태를 쪽지(대화) 흐름과 이어 붙여, 지원(`applicationId`)을 매개로 대화방과 계약을 연결
 
-<details>
-<summary><b>🧑‍💻 김락현 </b></summary>
+### 계약 상태 흐름
 
-- 인증/인가 도메인
-- 신뢰 및 리뷰 도메인
-- 지원 완료 API
+```mermaid
+stateDiagram-v2
+    [*] --> DRAFT: 클라이언트 임시 저장
+    DRAFT --> NOTIFIED: 모델에게 발송 (notify)
+    NOTIFIED --> VIEWED: 모델 열람
+    VIEWED --> CONFIRMED: 양측 동의 (agree)
+    VIEWED --> REJECTED: 모델 거부 (reject)
+    CONFIRMED --> [*]
+    REJECTED --> [*]
+```
+
+### API 요약 — `/api/v1/contracts`
+
+| Method | Endpoint | 설명 |
+|--------|----------|------|
+| `POST` | `/` | 계약서 임시 저장 (DRAFT 생성) |
+| `GET` | `/` | 상태별 계약 내역 조회 (CLIENT·MODEL) |
+| `GET` | `/templates` | 계약서 템플릿 목록 조회 (CLIENT) |
+| `POST` | `/pdf` | 계약서 PDF 생성 (CLIENT) |
+| `POST` | `/{id}/notify` | 계약서 모델에게 발송 (CLIENT) |
+| `GET` | `/{id}` | 계약서 열람 (MODEL) |
+| `PATCH` | `/{id}/agree` | 계약서 동의 (양측 동의 시 자동 확정) |
+| `PATCH` | `/{id}/reject` | 계약서 거부 (MODEL) |
+
+> 전체 API는 백엔드 실행 후 [Swagger UI](http://modle-production.up.railway.app/swagger-ui/index.html)에서 확인할 수 있습니다.
+
+---
+
+## 🔧 트러블슈팅 · 3N+2 쿼리를 5개로
+
+> 모델 마이페이지의 "계약 내역" 탭이 계약이 쌓일수록 느려졌습니다. **같은 API인데 기업 계정으로 보면 멀쩡**했던 게 실마리였습니다.
+
+<table>
+<tr><th>구분</th><th>변경 전</th><th>변경 후</th></tr>
+<tr><td>공고(<code>job_posting</code>)</td><td><code>id=?</code> 개별 N번</td><td><code>id in (…)</code> <b>1번</b></td></tr>
+<tr><td>기업(<code>client</code>)</td><td><code>user_id=?</code> 개별 N번</td><td><code>id in (…)</code> <b>1번</b></td></tr>
+<tr><td>유저</td><td>N번 (낭비)</td><td><b>제거</b></td></tr>
+<tr><td><b>합계</b></td><td><b>3N + 2</b></td><td><b>약 5개 상수</b></td></tr>
+</table>
+
+- **원인** — 목록을 순회하며 계약 1건마다 공고·유저·기업을 개별 조회. 그중 유저 조회는 넣은 값을 그대로 돌려받는 **낭비 쿼리**였습니다.
+- **해결** — id를 모아 `IN` 배치 조회 후 `Map`으로 매칭. 낭비 쿼리는 제거. 바로 옆 `getClientContracts`가 이미 쓰던 패턴을 모델 경로에도 이식했습니다.
+- **검증** — 리팩터링 전/후를 각각 띄워 같은 필터를 눌러 SQL 로그를 세어봤고, 변경 전 **공고 6번·기업 6번**이 계약 건수에 정확히 비례(3N+2)함을 확인, 변경 후엔 각각 `IN` 한 방으로 접혔습니다.
+
+📖 **자세한 과정 →** [계약이 쌓일수록 느려지는 목록 화면, 3N+2 쿼리를 5개로 줄인 이야기](트러블슈팅-계약목록-N+1.md)
+
+---
+
+## 🧭 기술적 의사결정 기록
+
+계약 도메인을 만들며 내린 판단들을, "왜 그렇게 했는가"와 함께 남깁니다.
+
+<details open>
+<summary><b>① 왜 <code>@EntityGraph</code>·fetch join이 아니라 배치 + Map인가</b></summary>
+
+<br>
+
+우리 프로젝트는 도메인 결합을 끊기 위해 엔티티를 `@ManyToOne`으로 엮지 않고 **`Long` id 값으로만 참조**합니다(`Application`은 `Long jobPostingId`). `@EntityGraph`·`@BatchSize`·fetch join은 전부 **JPA 연관관계 위에서만 동작**하는데, 우리에겐 숫자 컬럼뿐이라 묶어서 당겨올 연관 자체가 없습니다. 게다가 이번 N+1은 lazy 로딩이 아니라 **루프 안에서 `service.findById()`를 직접 반복 호출**해 난 것이라, 그 어노테이션이 손댈 종류도 아니었습니다. **id 참조 설계에서는 배치 + Map이 대체재가 아니라 정공법**입니다.
 
 </details>
 
 <details>
-<summary><b>🧑‍💻 김영욱 </b></summary>
+<summary><b>② 목록 조회에서 예외 대신 <code>null</code>을 택한 이유</b></summary>
 
-- 공고 도메인
-- 지원 보류 및 취소 API
+<br>
 
-</details>
-
-<details>
-<summary><b>🧑‍💻 신재희 </b></summary>
-
-- 프로필 도메인
-- 프론트
+배치로 바꾸니 없는 데이터가 예외 대신 `null`이 됩니다. 단건 조회라면 예외(fail-fast)가 맞지만, **목록에서 예외를 던지면 계약 하나 때문에 화면 전체가 안 열립니다.** 공고는 하드 삭제가 가능해 "절대 없을 수 없는 상태"도 아니고, 코드베이스의 다른 배치 목록도 이미 null을 허용하고 있어 일관되게 null을 유지했습니다. **"방어적"의 방향은 맥락마다 다르다** — 단건의 fail-fast가 목록에선 화면을 통째로 깨는 fail-loud가 됩니다.
 
 </details>
 
 <details>
-<summary><b>🧑‍💻 임현호 </b></summary>
+<summary><b>③ 계약–지원–쪽지를 <code>applicationId</code>로 잇는 설계</b></summary>
 
-- 계약 도메인
-- 계약-쪽지 연동 API
+<br>
 
-</details>
-
-<details>
-<summary><b>🧑‍💻 최정우 </b></summary>
-
-- 쪽지 도메인
-- AI 추천 도메인
+계약(`Contract`)은 지원(`Application`)당 하나이므로 `applicationId`를 유니크 키로 참조합니다. 쪽지 대화방(`MessageConversation`) 역시 `applicationId`(nullable)를 갖고 있어, **지원 건을 공통 매개로 계약 진행 상태와 대화 흐름을 연결**했습니다. 여기서도 도메인 간 직접 엔티티 참조 대신 id 참조 원칙을 지켰습니다.
 
 </details>
 
@@ -111,27 +157,19 @@ AI 추천 기반으로 연결하고, 지원·계약·리뷰까지 한 곳에서 
 ![JWT](https://img.shields.io/badge/JWT-000000?style=flat-square&logo=jsonwebtokens&logoColor=white)
 ![Gradle](https://img.shields.io/badge/Gradle-Kotlin_DSL-02303A?style=flat-square&logo=gradle&logoColor=white)
 
-### Frontend
-![Next.js](https://img.shields.io/badge/Next.js-16-000000?style=flat-square&logo=nextdotjs&logoColor=white)
-![React](https://img.shields.io/badge/React-19-61DAFB?style=flat-square&logo=react&logoColor=black)
-![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?style=flat-square&logo=typescript&logoColor=white)
-![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4-06B6D4?style=flat-square&logo=tailwindcss&logoColor=white)
-
 ### Database & Infra
 ![MySQL](https://img.shields.io/badge/MySQL-4479A1?style=flat-square&logo=mysql&logoColor=white)
 ![Redis](https://img.shields.io/badge/Redis-7.0-DC382D?style=flat-square&logo=redis&logoColor=white)
 ![GCP](https://img.shields.io/badge/Google_Cloud_Storage-4285F4?style=flat-square&logo=googlecloud&logoColor=white)
 ![Docker](https://img.shields.io/badge/Docker-2496ED?style=flat-square&logo=docker&logoColor=white)
 
-### AI / 외부 연동
-- **OpenAI Embeddings** — 공고/모델 텍스트 임베딩 (추천용 벡터 생성)
-- **Groq API** — LLM 기반 처리
-- **OAuth2** — Google · Kakao · Naver 소셜 로그인
-- **Sendgrid** — 이메일 인증/알림 발송
-- **OpenHTMLtoPDF** — 계약서 PDF 생성
-- **Swagger (springdoc-openapi)** — API 문서 자동화
+### 계약 도메인에서 특히 쓴 것
+- **OpenHTMLtoPDF** (1.0.10) — 계약서 HTML 템플릿 → PDF 생성
+- **Spring Cloud GCP Storage** (5.0.4) — 서명 완료 PDF 저장
+- **Spring Data JPA / MySQL** — 계약·지원·기업 도메인 조회 및 배치 최적화
 
-### 상세 버전
+<details>
+<summary><b>전체 상세 버전</b></summary>
 
 | 구분 | 기술 | 버전 |
 |------|------|------|
@@ -147,315 +185,60 @@ AI 추천 기반으로 연결하고, 지원·계약·리뷰까지 한 곳에서 
 | Frontend | Next.js | 16.2.9 |
 | Frontend | React | 19.2.4 |
 | Styling | Tailwind CSS | 4 |
-| API Client | openapi-fetch / openapi-typescript | - |
 
----
-
-## ✨ 주요 기능
-
-### 👤 회원 / 인증 (`user`)
-- 모델 / 클라이언트 / 관리자 역할(Role) 기반 회원가입 및 로그인
-- 로컬 가입 + **OAuth2 소셜 로그인** (Google, Kakao, Naver)
-- **JWT** Access / Refresh 토큰 인증, Redis 기반 토큰 관리
-- 이메일 인증, 비밀번호 찾기
-- 회원 상태 관리 (ACTIVE / PENDING / INCOMPLETE / REJECTED / SUSPENDED)
-
-### 🧑‍🎤 프로필 / 포트폴리오 (`profile`)
-- 모델 프로필 (신체 정보, 사이즈, 경력, 활동 가능 요일, 지역/카테고리/태그)
-- 클라이언트 프로필 (업체 정보, 클라이언트 유형)
-- 포트폴리오 이미지 업로드 (드래그 앤 드롭 순서 변경 — `@dnd-kit`)
-- 모델 북마크 / 클라이언트 태그
-
-### 📋 공고 (`jobposting`)
-- 클라이언트의 모델 구인 공고 등록 / 수정 / 마감
-- 카테고리·지역·성별·연령·신체조건·페이 타입(현금/서비스) 등 상세 조건
-- 공고 이미지 첨부, 공고 북마크
-- **AI 추천** — 임베딩 기반 모델↔공고 추천 (`ModelEmbedding`, `PostEmbedding`, `Recommendation`)
-
-### 📨 지원 (`application`)
-- 모델의 공고 지원 / 지원 취소 (자기소개 포함)
-- 지원 상태 흐름 관리: 지원 → 연락 → 계약서 발송 → 촬영 → 완료 / 보류 / 취소
-
-### 💬 쪽지 (`message`)
-- 클라이언트 ↔ 모델 간 1:1 쪽지(대화) 기능
-- 읽음 처리, 시스템 메시지(SenderType), 카드형 배너 메시지
-
-### 📝 계약 (`contract`)
-- 전자 계약서 작성 (촬영 일정, 장소, 페이, 사용 범위 등)
-- **계약서 PDF 생성** 및 양 당사자 동의/서명, IP·시각 기록
-- 계약 상태 흐름: DRAFT → NOTIFIED → VIEWED → CONFIRMED / REJECTED
-- 계약서 템플릿(`ContractTemplate`)
-
-### ⭐ 리뷰 / 신고 (`review`)
-- 촬영 완료 후 클라이언트↔모델 **상호 리뷰** (지원 건당 1회)
-- 평점 집계 (평균 평점, 리뷰 수)
-- 신고(Report) 기능 및 검증
-
-### 🛡 관리자 (`admin`)
-- 클라이언트 가입 승인 / 거절
-- 신고 처리, 회원 경고·정지 관리
-- 거절된 회원 자동 정리 스케줄러
-
----
-
-## 📖 API 명세서
-
-전체 API는 **Swagger UI**로 자동 문서화되어 있습니다. 백엔드 실행 후 아래 주소에서 요청/응답 스키마와 함께 직접 테스트할 수 있습니다.
-
-> 🔗 [**Swagger UI**](http://modle-production.up.railway.app/swagger-ui/index.html)
-
-- 모든 엔드포인트는 `/api/v1` 하위에 위치합니다.
-- 인증이 필요한 API는 **JWT 토큰(쿠키)** 기반으로 동작합니다.
-- 아래는 주요 엔드포인트 요약이며, 상세 스펙은 Swagger를 참고하세요.
-
-<details>
-<summary><b>🔐 인증 / 회원 — <code>/api/v1/auth</code></b></summary>
-
-| Method | Endpoint | 설명 |
-|--------|----------|------|
-| `POST` | `/signup/model` | 모델 회원가입 |
-| `POST` | `/signup/client` | 의뢰인 회원가입 (관리자 승인 필요) |
-| `POST` | `/signup/additional` | 소셜 가입 추가 정보 입력 |
-| `POST` | `/email/verify/send` | 이메일 인증 코드 발송 |
-| `POST` | `/email/verify/confirm` | 이메일 인증 코드 확인 |
-| `POST` | `/login` | 로그인 (토큰 쿠키 발급) |
-| `POST` | `/logout` | 로그아웃 |
-| `POST` | `/reissue` | 액세스/리프레시 토큰 재발급 |
-| `GET` | `/me` | 내 정보 조회 |
-| `POST` | `/password/reset/send` | 비밀번호 재설정 코드 발송 |
-| `POST` | `/password/reset/confirm` | 비밀번호 재설정 코드 확인 |
-| `POST` | `/password/reset` | 비밀번호 재설정 |
-
-</details>
-
-<details>
-<summary><b>🧑‍🎤 모델 프로필 — <code>/api/v1/models</code></b></summary>
-
-| Method | Endpoint | 설명 |
-|--------|----------|------|
-| `GET` | `/` | 모델 다건 조회 및 필터링 |
-| `GET` | `/{id}` | 모델 단건 조회 |
-| `GET` | `/my` | 내 프로필 조회 |
-| `PUT` | `/my` | 내 프로필 수정 |
-| `DELETE` | `/{id}` | 모델 삭제 |
-
-</details>
-
-<details>
-<summary><b>🏢 의뢰인 프로필 — <code>/api/v1/clients</code></b></summary>
-
-| Method | Endpoint | 설명 |
-|--------|----------|------|
-| `GET` | `/` | 의뢰인 다건 조회 |
-| `GET` | `/{id}` | 의뢰인 단건 조회 |
-| `GET` | `/my` | 내 프로필 조회 |
-| `GET` | `/{id}/job-postings` | 의뢰인 공개 공고 목록 (상태 필터) |
-| `PUT` | `/my` | 내 프로필 수정 |
-| `DELETE` | `/{id}` | 의뢰인 삭제 |
-
-</details>
-
-<details>
-<summary><b>🖼 포트폴리오 / 이미지 / 경력</b></summary>
-
-**포트폴리오** — `/api/v1/portfolios`
-| Method | Endpoint | 설명 |
-|--------|----------|------|
-| `POST` | `/` | 포트폴리오 이미지 업로드 (다중, MODEL) |
-| `PUT` | `/{id}` | 포트폴리오 정보 수정 |
-| `PUT` | `/reorder` | 포트폴리오 노출 순서 변경 |
-| `DELETE` | `/{id}` | 포트폴리오 삭제 |
-
-**이미지** — `/api/v1/images`
-| Method | Endpoint | 설명 |
-|--------|----------|------|
-| `POST` | `/upload` | 이미지 GCS 업로드 후 URL 반환 |
-
-**경력** — `/api/v1`
-| Method | Endpoint | 설명 |
-|--------|----------|------|
-| `GET` | `/careers/my` | 내 경력 조회 (MODEL) |
-| `GET` | `/models/{modelId}/careers` | 모델 공개 경력 조회 |
-| `PATCH` | `/careers/{careerId}/public` | 경력 공개 여부 변경 (MODEL) |
-
-</details>
-
-<details>
-<summary><b>📋 공고 — <code>/api/v1/jobs</code></b></summary>
-
-| Method | Endpoint | 설명 |
-|--------|----------|------|
-| `POST` | `/templates/generate` | AI 공고 본문 생성 (CLIENT) |
-| `POST` | `/` | 공고 등록 + AI 모델 추천 트리거 (CLIENT) |
-| `GET` | `/` | 공고 목록 조회 (지역·카테고리·상태 필터) |
-| `GET` | `/{id}` | 공고 상세 조회 (역할별 맞춤) |
-| `PATCH` | `/{id}` | 공고 수정 (CLIENT) |
-| `DELETE` | `/{id}` | 공고 삭제 (CLIENT) |
-| `PATCH` | `/{id}/status` | 공고 상태 변경 (CLIENT) |
-| `GET` | `/my` | 내가 작성한 전체 공고 목록 (CLIENT) |
-| `GET` | `/mine/recruiting` | 내 모집 중 공고 목록 (CLIENT) |
-| `GET` | `/{id}/recommendations` | AI 추천 모델 목록 (CLIENT) |
-| `POST` | `/{id}/recommendations/unlock` | 추천 모델 잠금 해제 (CLIENT) |
-
-</details>
-
-<details>
-<summary><b>📨 지원 — <code>/api/v1</code></b></summary>
-
-| Method | Endpoint | 설명 |
-|--------|----------|------|
-| `POST` | `/jobs/{id}/apply` | 공고 지원 (MODEL) |
-| `GET` | `/jobs/{id}/apply-status` | 지원 여부 확인 (MODEL) |
-| `GET` | `/jobs/{id}/applicants` | 지원자 목록 조회 (CLIENT) |
-| `GET` | `/applications/my` | 내 지원 목록 조회 (MODEL) |
-| `PATCH` | `/applications/{id}/cancel` | 지원 취소 (MODEL) |
-| `POST` | `/applications/{id}/contact` | 지원자 컨택 (CLIENT) |
-| `GET` | `/applications/{id}/contacts` | 컨택 이력 조회 |
-| `GET` | `/applications/{id}/contract-status` | 계약 진행 상태 조회 |
-| `GET` | `/applications/{id}/contract-draft` | 계약 임시저장 조회 (CLIENT) |
-| `PATCH` | `/applications/{id}/hold` | 촬영 보류 (CLIENT) |
-| `PATCH` | `/applications/{id}/cancel-shooting` | 촬영 취소 (CLIENT) |
-| `PATCH` | `/applications/{id}/resume` | 촬영 재개 (CLIENT) |
-| `PATCH` | `/applications/{id}/complete` | 촬영 완료 처리 (CLIENT) |
-| `POST` | `/applications/{id}/re-recruit` | 재모집 전환 (CLIENT) |
-
-</details>
-
-<details>
-<summary><b>📝 계약 — <code>/api/v1/contracts</code></b></summary>
-
-| Method | Endpoint | 설명 |
-|--------|----------|------|
-| `POST` | `/` | 계약서 임시 저장 (DRAFT 생성) |
-| `GET` | `/` | 상태별 계약 내역 조회 (CLIENT·MODEL) |
-| `GET` | `/templates` | 계약서 템플릿 목록 조회 (CLIENT) |
-| `POST` | `/pdf` | 계약서 PDF 생성 (CLIENT) |
-| `POST` | `/{id}/notify` | 계약서 모델에게 발송 (CLIENT) |
-| `GET` | `/{id}` | 계약서 열람 (MODEL) |
-| `PATCH` | `/{id}/agree` | 계약서 동의 (양측 동의 시 자동 확정) |
-| `PATCH` | `/{id}/reject` | 계약서 거부 (MODEL) |
-
-</details>
-
-<details>
-<summary><b>💬 쪽지 — <code>/api/v1/messages</code></b></summary>
-
-| Method | Endpoint | 설명 |
-|--------|----------|------|
-| `POST` | `/conversations` | 대화방 생성 |
-| `GET` | `/conversations` | 내 대화 목록 조회 |
-| `GET` | `/conversations/{conversationId}/messages` | 대화방 메시지 조회 (페이징) |
-| `POST` | `/` | 쪽지 전송 |
-| `PATCH` | `/read` | 대화방 읽음 처리 |
-| `DELETE` | `/conversations/{conversationId}` | 대화방 삭제 |
-
-</details>
-
-<details>
-<summary><b>⭐ 북마크 / 리뷰 / 신고</b></summary>
-
-**북마크** — `/api/v1/bookmarks`
-| Method | Endpoint | 설명 |
-|--------|----------|------|
-| `POST` | `/jobs/{jobPostingId}` | 공고 북마크 추가 (MODEL) |
-| `DELETE` | `/jobs/{jobPostingId}` | 공고 북마크 삭제 (MODEL) |
-| `GET` | `/jobs` | 내 공고 북마크 목록 (MODEL) |
-| `POST` | `/models/{modelId}` | 모델 북마크 추가 (CLIENT) |
-| `DELETE` | `/models/{modelId}` | 모델 북마크 삭제 (CLIENT) |
-| `GET` | `/models` | 내 모델 북마크 목록 (CLIENT) |
-
-**리뷰** — `/api/v1/reviews`
-| Method | Endpoint | 설명 |
-|--------|----------|------|
-| `POST` | `/` | 리뷰 작성 (의뢰인↔모델) |
-| `GET` | `/users/{userId}/reviews` | 특정 유저가 받은 리뷰 목록 |
-
-**신고** — `/api/v1`
-| Method | Endpoint | 설명 |
-|--------|----------|------|
-| `POST` | `/reports` | 신고 접수 |
-| `GET` | `/admin/reports` | 신고 목록 조회 (ADMIN) |
-| `PATCH` | `/admin/reports/{reportId}` | 신고 처리 (ADMIN) |
-
-</details>
-
-<details>
-<summary><b>🛡 관리자 — <code>/api/v1/admin</code></b></summary>
-
-| Method | Endpoint | 설명 |
-|--------|----------|------|
-| `GET` | `/clients/pending` | 승인 대기 의뢰인 목록 조회 |
-| `PATCH` | `/clients/{userId}/approve` | 의뢰인 가입 승인 |
-| `PATCH` | `/clients/{userId}/reject` | 의뢰인 가입 반려 |
-| `GET` | `/users/warnings` | 경고 누적 유저 목록 조회 |
-| `GET` | `/reports/no-show` | 노쇼 신고 목록 조회 |
-| `PATCH` | `/users/{userId}/suspend` | 계정 정지 |
+프론트엔드(Next.js/React/Tailwind)와 AI 추천(OpenAI Embeddings, Groq)은 팀원이 담당했습니다.
 
 </details>
 
 ---
 
-## 📂 파일 구조
+## 🗄 데이터 모델
 
+계약 도메인이 맞닿는 부분(지원·기업·쪽지)을 발췌한 ERD입니다. **엔티티 간 관계는 FK가 아니라 `Long` id 값 참조**로 맺어져 있습니다.
+
+```mermaid
+erDiagram
+    APPLICATION ||..o| CONTRACT : "results in (applicationId)"
+    APPLICATION ||..o| MESSAGE_CONVERSATION : "linked by (applicationId)"
+    JOB_POSTING }o..o{ APPLICATION : "receives (jobPostingId)"
+    CLIENT }o..o{ JOB_POSTING : "writes (clientId)"
+
+    CONTRACT {
+        Long id PK
+        Long applicationId UK "ID 참조"
+        ContractType contractType
+        ContractStatus status "DRAFT / NOTIFIED / VIEWED / CONFIRMED / REJECTED"
+        BigDecimal payment
+        boolean clientAgreed
+        boolean modelAgreed
+        String signedPdfUrl
+    }
+    APPLICATION {
+        Long id PK
+        Long jobPostingId "ID 참조"
+        Long modelId "ID 참조"
+        ApplicationStatus status
+    }
+    JOB_POSTING {
+        Long id PK
+        Long clientId "ID 참조"
+        String title
+        JobPostingStatus status
+    }
+    CLIENT {
+        Long id PK
+        Long user_id FK
+        String companyName
+    }
+    MESSAGE_CONVERSATION {
+        Long id PK
+        Long clientId "User.id"
+        Long modelId "User.id"
+        Long applicationId "nullable"
+    }
 ```
-AIBE6_Project2_Team01/
-├── modle_backend/                # Spring Boot 백엔드
-│   ├── src/main/java/com/modle/
-│   │   ├── ModleBackendApplication.java
-│   │   ├── domain/               # 도메인별 패키지 (controller/service/repository/entity/dto)
-│   │   │   ├── admin/            # 관리자
-│   │   │   ├── application/      # 지원
-│   │   │   ├── bookmark/         # 북마크
-│   │   │   ├── contract/         # 계약 (+ pdf, template, init)
-│   │   │   ├── jobposting/       # 공고 (+ AI 추천 embedding)
-│   │   │   ├── message/          # 쪽지
-│   │   │   ├── profile/          # 프로필/포트폴리오/태그
-│   │   │   ├── review/           # 리뷰/신고
-│   │   │   └── user/             # 회원/인증
-│   │   ├── global/               # 공통 모듈
-│   │   │   ├── auth/             # 인증 (JWT 등)
-│   │   │   ├── config/           # Security, Redis, Async, OpenApi 설정
-│   │   │   ├── entity/           # BaseEntity
-│   │   │   ├── exception/        # 예외 처리
-│   │   │   ├── gcs/              # GCS 파일 업로드
-│   │   │   ├── response/         # 공통 응답
-│   │   │   ├── rq/               # 요청 컨텍스트
-│   │   │   ├── scheduler/        # 스케줄러
-│   │   │   └── util/
-│   │   └── infra/                # 외부 연동
-│   │       ├── ai/               # OpenAI Embedding, Groq API
-│   │       └── mail/             # 메일 발송
-│   ├── src/main/resources/
-│   │   ├── application.yml       # 공통 설정
-│   │   ├── application-dev.yml
-│   │   ├── application-test.yml
-│   │   ├── fonts/                # PDF용 폰트
-│   │   └── templates/            # 계약서 템플릿 등
-│   ├── docker-compose.yml        # Redis
-│   └── build.gradle.kts
-│
-├── modle_frontend/               # Next.js 프론트엔드
-│   ├── src/
-│   │   ├── app/                  # App Router (페이지)
-│   │   │   ├── (auth)/           # 로그인/회원가입/비밀번호찾기
-│   │   │   ├── admin/            # 관리자
-│   │   │   ├── application/      # 지원
-│   │   │   ├── clients/          # 클라이언트
-│   │   │   ├── contracts/        # 계약
-│   │   │   ├── jobs/             # 공고
-│   │   │   ├── messages/         # 쪽지
-│   │   │   ├── models/           # 모델
-│   │   │   └── my/               # 마이페이지
-│   │   ├── components/           # UI 컴포넌트 (도메인별)
-│   │   ├── hooks/                # 커스텀 훅
-│   │   ├── lib/                  # api 클라이언트, auth, constants
-│   │   └── types/
-│   ├── public/
-│   └── package.json
-│
-├── docs/                         # 설계 문서
-└── README.md
-```
+
+> 서비스 전체 ERD는 [`README.team-original.md`](README.team-original.md#-erd)에서 볼 수 있습니다.
 
 ---
 
@@ -503,200 +286,7 @@ flowchart TD
     class FE client;
     class BE server;
     class MySQL,Redis data;
-    class GCS,AI,OAuth,SMTP ext;
-```
-
----
-
-## 🗄 ERD
-
-```mermaid
-erDiagram
-    %% ===== 회원 / 프로필 =====
-    USER ||--o| MODEL : "1:1"
-    USER ||--o| CLIENT : "1:1"
-    MODEL ||--o{ PORTFOLIO : "owns"
-    MODEL ||--o{ MODEL_TAG : "tagged"
-    MODEL ||--o{ MODEL_CATEGORY : "has"
-    MODEL ||--o{ MODEL_REGION : "active in"
-    TAG ||--o{ MODEL_TAG : "used by"
-
-    %% ===== 공고 / 지원 (ID 참조) =====
-    CLIENT }o..o{ JOB_POSTING : "writes (clientId)"
-    JOB_POSTING ||--o{ JOB_POSTING_IMAGE : "has"
-    JOB_POSTING }o..o{ APPLICATION : "receives (jobPostingId)"
-    MODEL }o..o{ APPLICATION : "applies (modelId)"
-    MODEL }o..o{ JOB_POSTING_BOOKMARK : "bookmarks"
-    CLIENT }o..o{ MODEL_BOOKMARK : "bookmarks"
-    MODEL }o..o{ CAREER : "earns"
-
-    %% ===== AI 추천 =====
-    JOB_POSTING }o..o{ RECOMMENDATION : "recommends (postId)"
-    MODEL }o..o{ RECOMMENDATION : "recommended (modelId)"
-
-    %% ===== 계약 / 리뷰 / 신고 =====
-    APPLICATION ||..o| CONTRACT : "results in (applicationId)"
-    APPLICATION }o..o{ REVIEW : "evaluated by (applicationId)"
-    USER }o..o{ REPORT : "reports (reporterId)"
-
-    %% ===== 쪽지 =====
-    MESSAGE_CONVERSATION ||--o{ MESSAGE : "contains"
-
-    USER {
-        Long id PK
-        String email UK
-        String password
-        Role role "MODEL / CLIENT / ADMIN"
-        Provider provider "LOCAL / GOOGLE / KAKAO / NAVER"
-        UserStatus status
-        int warningCount
-        String region
-    }
-    MODEL {
-        Long id PK
-        Long user_id FK
-        String name
-        int height
-        int weight
-        Sex sex
-        int age
-        Integer experience
-        double avgRating
-        int reviewCount
-        String profileImageUrl
-    }
-    CLIENT {
-        Long id PK
-        Long user_id FK
-        ClientType clientType
-        String companyName
-        String companyNumber
-        double avgRating
-        int reviewCount
-    }
-    PORTFOLIO {
-        Long id PK
-        Long model_id FK
-        String imgUrl
-        Category category
-        Integer displayOrder
-    }
-    TAG {
-        Long id PK
-        String name
-        TagType type "REGION / STYLE / BRAND / ETC"
-        int is_default
-    }
-    MODEL_TAG {
-        Long id PK
-        Long model_id FK
-        Long tag_id FK
-    }
-    MODEL_CATEGORY {
-        Long id PK
-        Long model_id FK
-        Category category
-    }
-    MODEL_REGION {
-        Long id PK
-        Long model_id FK
-        Region region
-    }
-    JOB_POSTING {
-        Long id PK
-        Long clientId "ID 참조"
-        String title
-        Category category
-        Region region
-        JobPostingStatus status
-        RequiredSex requiredSex
-        BigDecimal payment
-        PayType payType
-        LocalDateTime shootDate
-    }
-    JOB_POSTING_IMAGE {
-        Long id PK
-        Long jobPostingId FK
-        String imageUrl
-        int displayOrder
-    }
-    JOB_POSTING_BOOKMARK {
-        Long id PK
-        Long modelId "ID 참조"
-        Long jobPostingId "ID 참조"
-    }
-    MODEL_BOOKMARK {
-        Long id PK
-        Long clientId "ID 참조"
-        Long modelId "ID 참조"
-    }
-    APPLICATION {
-        Long id PK
-        Long jobPostingId "ID 참조"
-        Long modelId "ID 참조"
-        String coverLetter
-        ApplicationStatus status
-    }
-    RECOMMENDATION {
-        Long id PK
-        Long postId "ID 참조"
-        Long modelId "ID 참조"
-        Long userId
-        int rank
-        double score
-    }
-    CAREER {
-        Long id PK
-        Long modelId "ID 참조"
-        Long jobPostingId "ID 참조 (nullable)"
-        String title
-        boolean isPublic
-        LocalDateTime shootDate
-    }
-    CONTRACT {
-        Long id PK
-        Long applicationId UK "ID 참조"
-        ContractType contractType
-        ContractStatus status
-        BigDecimal payment
-        boolean clientAgreed
-        boolean modelAgreed
-        String signedPdfUrl
-    }
-    REVIEW {
-        Long id PK
-        Long applicationId "ID 참조"
-        Long reviewerId "User.id"
-        Long targetId "User.id"
-        ReviewerRole reviewerRole
-        int rating
-        String content
-    }
-    REPORT {
-        Long id PK
-        Long reporterId "User.id"
-        ReportTargetType targetType
-        Long targetId
-        ReportReason reason
-        ReportStatus status
-    }
-    MESSAGE_CONVERSATION {
-        Long id PK
-        Long clientId "User.id"
-        Long modelId "User.id"
-        Long postId "nullable"
-        Long applicationId "nullable"
-    }
-    MESSAGE {
-        Long id PK
-        Long conversationId FK
-        Long senderId
-        Long receiverId
-        Long parentMessageId
-        String content
-        SenderType senderType "USER / SYSTEM"
-        boolean read
-    }
+    class GCS,AI,OAuth,Sendgrid ext;
 ```
 
 ---
@@ -711,7 +301,7 @@ erDiagram
 
 ### 1. 저장소 클론
 ```bash
-git clone https://github.com/prgrms-aibe-devcourse/AIBE6_Project2_Team01.git
+git clone https://github.com/predevho/AIBE6_Project2_Team01.git
 cd AIBE6_Project2_Team01
 ```
 
@@ -723,16 +313,12 @@ cd modle_backend
 docker compose up -d
 ```
 
-**(2) 환경 변수 설정**
-
-`modle_backend/.env` 파일을 생성하고 아래 값을 채워주세요.
+**(2) 환경 변수 설정** — `modle_backend/.env` 파일을 생성하고 값을 채웁니다.
 ```env
 DB_PASSWORD=your_mysql_password
 JWT_SECRET=your_jwt_secret
-
 REDIS_HOST=localhost
 REDIS_PORT=6379
-
 SPRING_PROFILES_ACTIVE=dev
 
 # Mail
@@ -765,11 +351,8 @@ FRONTEND_BASE_URL=http://localhost:3000
 **(3) 서버 실행**
 ```bash
 ./gradlew bootRun
-# Windows
-gradlew.bat bootRun
 ```
-- 백엔드: `http://localhost:8080`
-- Swagger UI: `http://localhost:8080/swagger-ui/index.html`
+- 백엔드: `http://localhost:8080` · Swagger UI: `http://localhost:8080/swagger-ui/index.html`
 
 ### 3. Frontend 실행
 ```bash
@@ -779,15 +362,22 @@ npm run dev
 ```
 - 프론트엔드: `http://localhost:3000`
 
-**(선택) API 타입 자동 생성** — 백엔드 실행 중일 때:
-```bash
-npm run gen:api
-```
-
 ---
+
+## 👥 팀 & 원본 프로젝트
+
+Modle은 아래 5명이 함께 개발한 팀 프로젝트이며, 이 저장소는 그중 **임현호**의 개인 포크입니다.
+
+| **김락현(팀장)** | **김영욱** | **신재희** | **임현호** | **최정우** |
+|---------|---------|---------|---------|---------|
+| [@Rakhyunn](https://github.com/Rakhyunn) | [@wooki0123](https://github.com/wooki0123) | [@SHINJAEHEE-DEV](https://github.com/SHINJAEHEE-DEV) | [@predevho](https://github.com/predevho) | [@woo0218](https://github.com/woo0218) |
+| 인증/인가 · 리뷰 · 지원 완료 | 공고 · 지원 보류/취소 | 프로필 · 프론트 | **계약 · 계약–쪽지 연동** | 쪽지 · AI 추천 |
+
+- 원본 팀 저장소: [prgrms-aibe-devcourse/AIBE6_Project2_Team01](https://github.com/prgrms-aibe-devcourse/AIBE6_Project2_Team01)
+- 팀 전체 관점 README: [`README.team-original.md`](README.team-original.md)
 
 <div align="center">
 
-**Modle**
+**Modle** · 계약 도메인 by [@predevho](https://github.com/predevho)
 
 </div>
