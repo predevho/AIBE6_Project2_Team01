@@ -34,7 +34,6 @@
 - 이 README는 **제가 담당한 계약(Contract) 도메인**을 중심으로, 기능·설계 판단·성능 개선 과정을 포트폴리오 관점에서 다시 정리한 문서입니다.
 - 전체 팀 관점의 원본 README는 [`README.team-original.md`](README.team-original.md)에 그대로 보존해 두었습니다.
 
-> **한 문장 요약** — 촬영 매칭 이후 이어지는 **전자 계약서 작성 → 발송 → 열람 → 양측 동의/확정** 흐름을 설계하고, 계약 목록 조회의 `3N+2` N+1 쿼리를 상수 5개로 줄였습니다.
 
 ---
 
@@ -90,7 +89,7 @@ stateDiagram-v2
 | `PATCH` | `/{id}/agree` | 계약서 동의 (양측 동의 시 자동 확정) |
 | `PATCH` | `/{id}/reject` | 계약서 거부 (MODEL) |
 
-> 전체 API는 백엔드 실행 후 [Swagger UI](http://modle-production.up.railway.app/swagger-ui/index.html)에서 확인할 수 있습니다.
+> 전체 API는 백엔드 실행 후 [Swagger UI](http://localhost:8080/swagger-ui/index.html)에서 확인할 수 있습니다.
 
 ---
 
@@ -110,7 +109,7 @@ stateDiagram-v2
 - **해결** — id를 모아 `IN` 배치 조회 후 `Map`으로 매칭. 낭비 쿼리는 제거. 바로 옆 `getClientContracts`가 이미 쓰던 패턴을 모델 경로에도 이식했습니다.
 - **검증** — 리팩터링 전/후를 각각 띄워 같은 필터를 눌러 SQL 로그를 세어봤고, 변경 전 **공고 6번·기업 6번**이 계약 건수에 정확히 비례(3N+2)함을 확인, 변경 후엔 각각 `IN` 한 방으로 접혔습니다.
 
-📖 **자세한 과정 →** [계약이 쌓일수록 느려지는 목록 화면, 3N+2 쿼리를 5개로 줄인 이야기](트러블슈팅-계약목록-N+1.md)
+📖 **자세한 과정 →** [계약이 쌓일수록 느려지는 목록 화면, 3N+2 쿼리를 5개로 줄인 트러블슈팅](https://velog.io/@predev/%EB%B6%80%ED%8A%B8%EC%BA%A0%ED%94%84-2%EC%B0%A8%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8-%ED%8A%B8%EB%9F%AC%EB%B8%94%EC%8A%88%ED%8C%85N1))
 
 ---
 
