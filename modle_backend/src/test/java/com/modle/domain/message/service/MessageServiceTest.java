@@ -78,7 +78,7 @@ class MessageServiceTest {
 
         var response = messageService.createConversation(
                 1L,
-                new CreateConversationRequest(2L, 10L, null)
+                new CreateConversationRequest(2L, 10L)
         );
 
         assertThat(response.clientId()).isEqualTo(1L);
@@ -100,7 +100,7 @@ class MessageServiceTest {
 
         var response = messageService.createConversation(
                 1L,
-                new CreateConversationRequest(2L, 10L, null)
+                new CreateConversationRequest(2L, 10L)
         );
 
         assertThat(response.id()).isEqualTo(100L);
@@ -125,7 +125,7 @@ class MessageServiceTest {
 
         var response = messageService.createConversation(
                 1L,
-                new CreateConversationRequest(2L, 11L, null)
+                new CreateConversationRequest(2L, 11L)
         );
 
         assertThat(response.postId()).isEqualTo(11L);
@@ -141,7 +141,7 @@ class MessageServiceTest {
 
         assertThatThrownBy(() -> messageService.createConversation(
                 1L,
-                new CreateConversationRequest(2L, null, null)
+                new CreateConversationRequest(2L, null)
         ))
                 .isInstanceOf(CustomException.class)
                 .extracting(exception -> ((CustomException) exception).getErrorCode())
