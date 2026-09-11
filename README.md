@@ -93,7 +93,7 @@ stateDiagram-v2
 
 ---
 
-## 🔧 트러블슈팅 · 3N+2 쿼리를 5개로
+## 🔧 트러블슈팅 · 3N+4 쿼리를 6개로
 
 > 모델 마이페이지의 "계약 내역" 탭이 계약이 쌓일수록 느려졌습니다. **같은 API인데 기업 계정으로 보면 멀쩡**했던 게 실마리였습니다.
 
@@ -101,15 +101,26 @@ stateDiagram-v2
 <tr><th>구분</th><th>변경 전</th><th>변경 후</th></tr>
 <tr><td>공고(<code>job_posting</code>)</td><td><code>id=?</code> 개별 N번</td><td><code>id in (…)</code> <b>1번</b></td></tr>
 <tr><td>기업(<code>client</code>)</td><td><code>user_id=?</code> 개별 N번</td><td><code>id in (…)</code> <b>1번</b></td></tr>
-<tr><td>유저</td><td>N번 (낭비)</td><td><b>제거</b></td></tr>
-<tr><td><b>합계</b></td><td><b>3N + 2</b></td><td><b>약 5개 상수</b></td></tr>
+<tr><td>유저</td><td>서로 다른 기업 수만큼, 최대 N번 (낭비)</td><td><b>제거</b></td></tr>
+<tr><td>고정 (model·client·applications·contracts)</td><td>4번</td><td>4번</td></tr>
+<tr><td><b>합계</b></td><td><b>3N + 4</b></td><td><b>6개 상수</b></td></tr>
 </table>
+
+| 계약 수 | 변경 전 | 변경 후 |
+|---|---|---|
+| 1 | 7개 | **6개** |
+| 10 | 34개 | **6개** |
+| 100 | **304개** | **6개** |
+
+![변경 전/후 쿼리 수·응답 시간 실측](측정-계약목록-N+1/차트-쿼리수-응답시간.png)
 
 - **원인** — 목록을 순회하며 계약 1건마다 공고·유저·기업을 개별 조회. 그중 유저 조회는 넣은 값을 그대로 돌려받는 **낭비 쿼리**였습니다.
 - **해결** — id를 모아 `IN` 배치 조회 후 `Map`으로 매칭. 낭비 쿼리는 제거. 바로 옆 `getClientContracts`가 이미 쓰던 패턴을 모델 경로에도 이식했습니다.
-- **검증** — 리팩터링 전/후를 각각 띄워 같은 필터를 눌러 SQL 로그를 세어봤고, 변경 전 **공고 6번·기업 6번**이 계약 건수에 정확히 비례(3N+2)함을 확인, 변경 후엔 각각 `IN` 한 방으로 접혔습니다.
+- **검증** — Hibernate `StatementInspector`로 실행 SQL을 한 줄씩 세는 테스트([`ContractQueryCountTest`](modle_backend/src/test/java/com/modle/querycount/ContractQueryCountTest.java))를 붙여 리팩터링 전/후 커밋을 각각 돌렸습니다. 계약 100건에서 변경 전 **304개(3N+4)**, 변경 후 **6개**로 계약 건수와 무관하게 고정됨을 확인했습니다. 손으로 셀 때 놓쳤던 1개는 `User.client`의 `@OneToOne(mappedBy)`가 끌고 오는 client 조회로, 변경 전후 모두 동일하게 1개씩 나갑니다.
 
-📖 **자세한 과정 →** [계약이 쌓일수록 느려지는 목록 화면, 3N+2 쿼리를 5개로 줄인 트러블슈팅](https://velog.io/@predev/%EB%B6%80%ED%8A%B8%EC%BA%A0%ED%94%84-2%EC%B0%A8%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8-%ED%8A%B8%EB%9F%AC%EB%B8%94%EC%8A%88%ED%8C%85N1)
+📊 **측정 근거 →** [`측정-계약목록-N+1/`](측정-계약목록-N+1/README.md) — 실행된 SQL 전문·측정 방법·재현 절차
+
+📖 **자세한 과정 →** [계약이 쌓일수록 느려지는 목록 화면, 3N+4 쿼리를 6개로 줄인 트러블슈팅](https://velog.io/@predev/%EB%B6%80%ED%8A%B8%EC%BA%A0%ED%94%84-2%EC%B0%A8%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8-%ED%8A%B8%EB%9F%AC%EB%B8%94%EC%8A%88%ED%8C%85N1)
 
 ---
 

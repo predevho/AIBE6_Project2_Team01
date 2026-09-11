@@ -1,0 +1,5 @@
+before | N=1 distinctClients=1 | queries=7 | medianMs=7 | minMs=5 | maxMs=13 | byTable={model=1, client=2, application=1, contracts=1, job_posting=1, user=1}
+before | N=10 distinctClients=10 | queries=34 | medianMs=23 | minMs=15 | maxMs=33 | byTable={model=1, client=11, application=1, contracts=1, job_posting=10, user=10}
+before | N=10 distinctClients=1 | queries=25 | medianMs=11 | minMs=8 | maxMs=17 | byTable={model=1, client=11, application=1, contracts=1, job_posting=10, user=1}
+before | N=100 distinctClients=100 | queries=304 | medianMs=107 | minMs=82 | maxMs=171 | byTable={model=1, client=101, application=1, contracts=1, job_posting=100, user=100}
+before | N=100 distinctClients=1 | queries=205 | medianMs=116 | minMs=65 | maxMs=302 | byTable={model=1, client=101, application=1, contracts=1, job_posting=100, user=1}
