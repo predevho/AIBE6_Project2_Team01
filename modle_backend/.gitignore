@@ -42,3 +42,7 @@ out/
 
 ### Json 파일 ###
 gcs-key.json
+
+### 쿼리 수 측정 테스트(querycount) 출력 ###
+qc-result.txt
+qc-sql-*.log

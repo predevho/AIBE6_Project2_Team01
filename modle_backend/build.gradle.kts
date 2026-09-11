@@ -34,6 +34,8 @@ dependencies {
     testCompileOnly("org.projectlombok:lombok")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
     testAnnotationProcessor("org.projectlombok:lombok")
+    // 쿼리 수 측정 테스트(querycount)용 in-memory DB
+    testRuntimeOnly("com.h2database:h2")
     // JWT
     implementation("io.jsonwebtoken:jjwt-api:0.12.6")
     runtimeOnly("io.jsonwebtoken:jjwt-impl:0.12.6")
@@ -60,4 +62,6 @@ dependencyManagement {
 
 tasks.withType<Test> {
     useJUnitPlatform()
+    // ./gradlew test -Dqc.label=before 처럼 넘기면 쿼리 측정 결과 파일에 라벨이 붙는다
+    systemProperty("qc.label", System.getProperty("qc.label") ?: "?")
 }
